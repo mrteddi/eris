@@ -25,19 +25,12 @@ db.connect((err) => {
     console.log('MySql Connected...');
 });
 
-/*
-app.get('/api/someEndpoint', (req, res) => {
-    if( req.query.someEndpoint === "check" )
-
-    db.query( `select blah blah="${req.query.name}"`, ( err, result ) => {
-        res.send( result[0] )
-    });
-});
-*/
-
 app.get('/api/createBox', (req, res) => {
 
-    query = `create table ${req.query.name}(user varchar(20), ports varchar(5), enum varchar(5), accounts varchar(5), services varchar(5) )`;
+    // Required params
+    // box
+
+    query = `create table ${req.query.box}(user varchar(20), ports varchar(5), enum varchar(5), accounts varchar(5), services varchar(5) )`;
 
     db.query( query, ( err, result ) => {
         res.send( result[0] )
@@ -67,22 +60,24 @@ app.get('/api/updateUser', (req, res) => {
 
     query = `select ${req.query.field} from ${req.query.box} where user=${req.query.user}`
 
+    console.log( )
     db.query( query, ( err, result ) => {
-        res.send( result[0]['ports'] );
-        ret = result[0]['ports'];
+        ret = result[0][ req.query.field ];
         ret = ret.replaceAt( req.query.num, '1' );
 
         updateQuery = `update ${req.query.box} set ${req.query.field}='${ret}' where user=${req.query.user}`;
 
-        db.query( updateQuery, ( err, result ) => {
-            res.send( result[0] )
+        db.query( updateQuery, ( err, res2 ) => {
+            //res.send( res2[0] );
+        });
+
+        db.query( `select * from ${req.query.box} where user=${req.query.user}`, ( err, res3 ) => {
+            res.send( res3[0] );
         });
 
     });
 
 });
-
-
 
 const port = 5000;
 
