@@ -1,0 +1,23 @@
+{
+  "name": "erisscoreboard",
+  "version": "1.0.0",
+  "description": "Eris scoring service",
+  "main": "server.js",
+  "scripts": {
+    "client-install": "cd client && npm install",
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "Conor Moening",
+  "license": "GPLv3",
+  "devDependencies": {
+    "nodemon": "^1.14.6"
+  },
+  "dependencies": {
+    "concurrently": "^5.1.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  }
+}
