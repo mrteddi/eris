@@ -79,6 +79,26 @@ app.get('/api/updateUser', (req, res) => {
 
 });
 
+app.get(`/api/getInfo`, (req, res) => {
+
+    query = `select * from ${req.query.box} where user=${req.query.user}`;
+
+    db.query( query, ( err, result ) => {
+        res.send( result );
+    });
+
+});
+
+app.get(`/api/getAnswer`, (req, res) => {
+
+    query = `select * from machines where box='${req.query.box}'`;
+
+    db.query( query, ( err, result ) => {
+        res.send( result[0] );
+    });
+
+});
+
 const port = 5000;
 
 app.listen(port, () => `Server running on port ${port}`);
