@@ -3,6 +3,8 @@ const app = express();
 const mysql = require('mysql');
 const dbConfig = require('./config.json')
 
+app.use(express.json())
+
 String.prototype.replaceAt=function(index, char) {
     var a = this.split("");
     a[index] = char;
@@ -97,6 +99,12 @@ app.get(`/api/getAnswer`, (req, res) => {
         res.send( result[0] );
     });
 
+});
+
+app.post('/api/receiveDaemon', (req, res ) => {
+    console.log( req.body );
+
+    console.log( req.body['Type'] );
 });
 
 const port = 5000;
