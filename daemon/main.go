@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"daemon/erisconfig"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -21,11 +22,6 @@ type Message struct {
 }
 
 func sendInfo(reqB Message) {
-
-	// req = []byte(`{
-	// 	"test": "test123",
-	// 	"test2": "test456"
-	// }`)
 
 	req, err := json.Marshal(reqB)
 
@@ -67,7 +63,7 @@ func packets() {
 
 	// Building the filter string to check for wanted ports
 	//ports := []int{21, 22}
-	ports := config.ports
+	ports := erisconfig.Ports
 	filterStr := "tcp and ("
 	for i, p := range ports {
 		p := strconv.Itoa(p)
@@ -139,7 +135,7 @@ func files() {
 
 func main() {
 	go packets()
-	go files()
+	// go files()
 
 	for true {
 	}
