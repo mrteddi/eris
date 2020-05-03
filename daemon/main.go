@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/gopacket"
@@ -10,10 +15,59 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
+type Message struct {
+	Type string
+	Body string
+}
+
+func sendInfo(reqB Message) {
+
+	// req = []byte(`{
+	// 	"test": "test123",
+	// 	"test2": "test456"
+	// }`)
+
+	req, err := json.Marshal(reqB)
+
+	fmt.Println(string(req))
+
+	resp, err := http.Post("http://localhost:5000/api/receiveDaemon", "application/json", bytes.NewBuffer(req))
+
+	if err != nil {
+		fmt.Println("failed")
+	}
+
+	fmt.Println(resp)
+
+	defer resp.Body.Close()
+}
+
+func removeIndex(arr interface{}, i int) interface{} {
+
+	switch o := arr.(type) {
+	case []int:
+		arr := o
+		arr[i] = arr[len(arr)-1]
+		arr[len(arr)-1] = 0
+		arr = arr[:len(arr)-1]
+		return arr
+	case []string:
+		arr := o
+		arr[i] = arr[len(arr)-1]
+		arr[len(arr)-1] = ""
+		arr = arr[:len(arr)-1]
+		return arr
+	default:
+		return arr
+	}
+
+}
+
 func packets() {
 
 	// Building the filter string to check for wanted ports
-	ports := []int{21, 22}
+	//ports := []int{21, 22}
+	ports := config.ports
 	filterStr := "tcp and ("
 	for i, p := range ports {
 		p := strconv.Itoa(p)
@@ -22,9 +76,10 @@ func packets() {
 		} else {
 			filterStr += "port " + string(p)
 		}
-
 	}
 	filterStr += ")"
+
+	fmt.Println(filterStr)
 
 	if handle, err := pcap.OpenLive("wlp1s0", 1600, true, pcap.BlockForever); err != nil {
 		// Start pcap capture on the wireless interface
@@ -38,10 +93,20 @@ func packets() {
 			// Get the TCP layer from the captured packet
 			tcpInfo := packet.Layer(layers.LayerTypeTCP).(*layers.TCP)
 
+			if len(ports) == 0 {
+				fmt.Println("Packet goroutine | returned from goroutine")
+				return
+			}
 			// Check for matching ports
-			for _, p := range ports {
+			for i, p := range ports {
 				if tcpInfo.SrcPort == layers.TCPPort(p) {
 					fmt.Printf("Packet goroutine| Port %d found!\n", p)
+					ports = removeIndex(ports, i).([]int)
+					fmt.Println(ports)
+
+					req := Message{"port", strconv.Itoa(p)}
+
+					sendInfo(req)
 				}
 			}
 		}
@@ -49,9 +114,26 @@ func packets() {
 }
 
 func files() {
-	for i := 0; i < 100; i++ {
-		time.Sleep(400 * time.Millisecond)
-		fmt.Println("File goroutine|" + string(i))
+	files := map[string]string{
+		"/home/conor/git/eris/daemon/tmp":  "1588030155",
+		"/home/conor/git/eris/daemon/tmp2": "1588031976",
+	}
+	for true {
+		if len(files) == 0 {
+			fmt.Println("Files goroutine | returned from goroutine")
+			return
+		}
+		for file, readTime := range files {
+			cmd := exec.Command("stat", "--format", "%X", file)
+			stdout, _ := cmd.Output()
+			output := strings.TrimSuffix(string(stdout), "\n")
+
+			if output != readTime {
+				fmt.Printf("File goroutine | File %s found!\n", file)
+				delete(files, file)
+			}
+		}
+		time.Sleep(2 * time.Second)
 	}
 }
 
