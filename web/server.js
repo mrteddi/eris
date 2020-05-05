@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql');
-const dbConfig = require('./config.json')
+const dbConfig = require('./config.json');
+const { spawn } = require('child_process');
+fs = require('fs');
 
 app.use(express.json())
 
@@ -103,9 +105,52 @@ app.get(`/api/getAnswer`, (req, res) => {
 
 app.post('/api/receiveDaemon', (req, res ) => {
     console.log( req.body );
-
     console.log( req.body['Type'] );
+
+    res.send( "erisServer Okay" );
 });
+
+app.get( `/api/genDaemon`, ( req, res ) => {
+
+    network = req.query.network;
+    ports = req.query.ports;
+    fileString = "";
+    files = JSON.parse( req.query.files )['files'];
+    let jsonKeys = Object.keys( files );
+
+    jsonKeys.forEach( file => {
+        let obj = files[file];
+        fileString += `"${obj['fileName']}": "${obj['time']}",
+        `
+    });
+
+    erisConfig = `
+    package erisconfig
+
+    // Network interface configs
+    var Network string = "${network}"
+
+    // Ports configs
+    var Ports []int = []int{${ports}}
+
+    // Files configs
+    var Files map[string]string = map[string]string{
+        ${fileString}
+    }
+    `
+    fs.writeFile('/home/conor/go/src/daemon/erisconfig/erisconfig.go', erisConfig, function( err ) {
+        if (err) return console.log(err);
+    })
+    const build = spawn('go', ['build', '-o', './eris', '/home/conor/go/src/daemon']);
+    build.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+    res.send( "Eris Daemon Successfully created" );
+});
+
+app.get( `/api/downloadDaemon`, ( req, res ) => {
+    res.download( './eris' );
+})
 
 const port = 5000;
 
