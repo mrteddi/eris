@@ -25,15 +25,17 @@ func sendInfo(reqB Message) {
 
 	req, err := json.Marshal(reqB)
 
-	fmt.Println(string(req))
+	// fmt.Println(string(req))
 
-	resp, err := http.Post("http://localhost:5000/api/receiveDaemon", "application/json", bytes.NewBuffer(req))
+	resp, err := http.Post("http://10.0.0.206:5000/api/receiveDaemon", "application/json", bytes.NewBuffer(req))
 
 	if err != nil {
 		fmt.Println("failed")
+	} else {
+		fmt.Println("erisClient sent: " + string(req))
 	}
 
-	fmt.Println(resp)
+	// fmt.Println(resp)
 
 	defer resp.Body.Close()
 }
@@ -77,7 +79,7 @@ func packets() {
 
 	fmt.Println(filterStr)
 
-	if handle, err := pcap.OpenLive("wlp1s0", 1600, true, pcap.BlockForever); err != nil {
+	if handle, err := pcap.OpenLive(erisconfig.Network, 1600, true, pcap.BlockForever); err != nil {
 		// Start pcap capture on the wireless interface
 		panic(err)
 	} else if err := handle.SetBPFFilter(filterStr); err != nil {
@@ -89,31 +91,32 @@ func packets() {
 			// Get the TCP layer from the captured packet
 			tcpInfo := packet.Layer(layers.LayerTypeTCP).(*layers.TCP)
 
-			if len(ports) == 0 {
-				fmt.Println("Packet goroutine | returned from goroutine")
-				return
-			}
 			// Check for matching ports
 			for i, p := range ports {
 				if tcpInfo.SrcPort == layers.TCPPort(p) {
 					fmt.Printf("Packet goroutine| Port %d found!\n", p)
 					ports = removeIndex(ports, i).([]int)
-					fmt.Println(ports)
+					// fmt.Println(ports)
 
 					req := Message{"port", strconv.Itoa(p)}
 
 					sendInfo(req)
 				}
 			}
+			if len(ports) == 0 {
+				fmt.Println("Packet goroutine | returned from goroutine")
+				return
+			}
 		}
 	}
 }
 
 func files() {
-	files := map[string]string{
-		"/home/conor/git/eris/daemon/tmp":  "1588030155",
-		"/home/conor/git/eris/daemon/tmp2": "1588031976",
-	}
+	// files := map[string]string{
+	// 	"/home/conor/git/eris/daemon/tmp":  "1588030155",
+	// 	"/home/conor/git/eris/daemon/tmp2": "1588031976",
+	// }
+	files := erisconfig.Files
 	for true {
 		if len(files) == 0 {
 			fmt.Println("Files goroutine | returned from goroutine")
@@ -127,6 +130,9 @@ func files() {
 			if output != readTime {
 				fmt.Printf("File goroutine | File %s found!\n", file)
 				delete(files, file)
+
+				req := Message{"file", file}
+				sendInfo(req)
 			}
 		}
 		time.Sleep(2 * time.Second)
@@ -135,7 +141,7 @@ func files() {
 
 func main() {
 	go packets()
-	// go files()
+	go files()
 
 	for true {
 	}
