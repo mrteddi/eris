@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import Logo from './eris.png';
-import Machine from './components/machines.js';
-import Create from './components/create.js';
+import MachineList from './components/machinelist.js';
+// import Create from './components/create.js';
 
 class App extends Component {
 
@@ -22,8 +22,8 @@ class App extends Component {
                 </div>
             </header>
 
-            {/* <Machine/> */}
-            <Create/>
+            <MachineList/>
+            {/* <Create/> */}
         </div>
     );
   }

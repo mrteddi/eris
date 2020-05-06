@@ -29,7 +29,7 @@ db.connect((err) => {
     console.log('MySql Connected...');
 });
 
-app.get('/api/createBox', (req, res) => {
+app.get( `/api/createBox`, (req, res) => {
 
     // Required params
     // box
@@ -42,6 +42,23 @@ app.get('/api/createBox', (req, res) => {
 
 });
 
+app.get( `/api/getBoxes`, ( req, res ) => {
+
+    query = `select * from machines`;
+
+    db.query( query, ( err, result ) => {
+        // output = {};
+        // for( let i = 0; i < result.length; i++ ) {
+        //     console.log( result[i] );
+        //     // output.push( result[i] )
+        // }
+        res.send( result );
+    });
+});
+
+/*
+    Don't think is needed anymore
+*/
 app.get('/api/newUser', (req, res) => {
 
     // Requried params
@@ -57,6 +74,9 @@ app.get('/api/newUser', (req, res) => {
 
 });
 
+/*
+    Don't think is needed anymore
+*/
 app.get('/api/updateUser', (req, res) => {
 
     // Required params
