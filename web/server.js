@@ -3,6 +3,7 @@ const app = express();
 const mysql = require('mysql');
 const dbConfig = require('./config.json');
 const { spawn } = require('child_process');
+const request = require('request');
 fs = require('fs');
 
 app.use(express.json())
@@ -29,17 +30,60 @@ db.connect((err) => {
     console.log('MySql Connected...');
 });
 
-app.get( `/api/createBox`, (req, res) => {
+app.post( `/api/createBox`, (req, res) => {
 
-    // Required params
-    // box
+    query = `create table ${req.body['name']} (network varchar(60), fileNum int, portNum int, `;
+    insertQuery = `insert into ${req.body['name']} set network = "${req.body['network']}", `
+    insertQuery += `fileNum = ${req.body['files'].length}, portNum = ${req.body['ports'].length}, `
 
-    query = `create table ${req.query.box}(user varchar(20), ports varchar(5), enum varchar(5), accounts varchar(5), services varchar(5) )`;
+    filesJson = {
+        'files': []
+    }
+
+    for (let i = 0; i < req.body['files'].length; i++) {
+        query += `file${i} varchar(60), file${i}Point int, `;
+        insertQuery += `file${i} = "${req.body['files'][i][0]}", `;
+        let obj = {};
+        obj['fileName'] = req.body['files'][i][0];
+        obj['time'] = req.body['files'][i][1];
+        filesJson['files'].push( obj );
+    }
+    filesJson = JSON.stringify(filesJson);
+    for (let i = 0; i < req.body['ports'].length; i++) {
+        query += `port${i} varchar(60), port${i}Point int, `
+        insertQuery += `port${i} = "${req.body['ports'][i]}", `
+    }
+    query = query.slice(0, -2);
+    insertQuery = insertQuery.slice(0, -2);
+    query += ` );`
+    insertQuery += `;`
+
+    // console.log( query );
+    // console.log( insertQuery );
 
     db.query( query, ( err, result ) => {
-        res.send( result[0] )
+        if( err ) {
+            console.log( err );
+            return;
+        }
     });
 
+    db.query( insertQuery, ( err, result ) => {
+        if( err ) {
+            console.log( err );
+            return;
+        }
+    });
+
+    db.query( `insert into machines set box="${req.body['name']}"`, ( err, result ) => {
+        if( err ) {
+            console.log( err );
+            return;
+        }
+    });
+
+    query = `http://10.0.0.206:5000/api/genDaemon?network=${req.body['network']}&ports=${req.body['ports']}&files=${filesJson}`;
+    request.get( query );
 });
 
 app.get( `/api/getBoxes`, ( req, res ) => {
@@ -47,78 +91,33 @@ app.get( `/api/getBoxes`, ( req, res ) => {
     query = `select * from machines`;
 
     db.query( query, ( err, result ) => {
-        // output = {};
-        // for( let i = 0; i < result.length; i++ ) {
-        //     console.log( result[i] );
-        //     // output.push( result[i] )
-        // }
         res.send( result );
     });
 });
 
 /*
-    Don't think is needed anymore
+    Retrieve all the info from a machine's table
 */
-app.get('/api/newUser', (req, res) => {
-
-    // Requried params
-    // box user ports enum accounts services
-
-    query = `insert into ${req.query.box} set user=${req.query.user}, ports=${req.query.ports}, enum=${req.query.enum}, accounts=${req.query.accounts}, services=${req.query.services}`;
-
-    console.log( query );
-
-    db.query( query, ( err, result ) => {
-        res.send( result[0] )
-    });
-
-});
-
-/*
-    Don't think is needed anymore
-*/
-app.get('/api/updateUser', (req, res) => {
-
-    // Required params
-    // box user field num
-
-    query = `select ${req.query.field} from ${req.query.box} where user=${req.query.user}`
-
-    console.log( )
-    db.query( query, ( err, result ) => {
-        ret = result[0][ req.query.field ];
-        ret = ret.replaceAt( req.query.num, '1' );
-
-        updateQuery = `update ${req.query.box} set ${req.query.field}='${ret}' where user=${req.query.user}`;
-
-        db.query( updateQuery, ( err, res2 ) => {
-            //res.send( res2[0] );
-        });
-
-        db.query( `select * from ${req.query.box} where user=${req.query.user}`, ( err, res3 ) => {
-            res.send( res3[0] );
-        });
-
-    });
-
-});
-
 app.get(`/api/getInfo`, (req, res) => {
 
-    query = `select * from ${req.query.box} where user=${req.query.user}`;
+    query = `select * from ${req.query.box}`;
 
     db.query( query, ( err, result ) => {
+        for (let i = 0; i < result[0]['fileNum']; i++) {
+            if( result[0][`file${i}Point`] === null ) {
+                result[0][`file${i}`] = "??";
+                result[0][`file${i}Point`] = "0";
+            }   
+        }
+        for (let i = 0; i < result[0]['portNum']; i++) {
+            if( result[0][`port${i}Point`] === null ) {
+                result[0][`port${i}`] = "??";
+                result[0][`port${i}Point`] = "0";
+            }   
+        }
+
+        delete result[0]['network'];
         res.send( result );
-    });
-
-});
-
-app.get(`/api/getAnswer`, (req, res) => {
-
-    query = `select * from machines where box='${req.query.box}'`;
-
-    db.query( query, ( err, result ) => {
-        res.send( result[0] );
     });
 
 });
