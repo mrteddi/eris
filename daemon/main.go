@@ -17,6 +17,7 @@ import (
 )
 
 type Message struct {
+	Name string
 	Type string
 	Body string
 }
@@ -98,7 +99,7 @@ func packets() {
 					ports = removeIndex(ports, i).([]int)
 					// fmt.Println(ports)
 
-					req := Message{"port", strconv.Itoa(p)}
+					req := Message{erisconfig.Name, "port", strconv.Itoa(p)}
 
 					sendInfo(req)
 				}
@@ -131,7 +132,7 @@ func files() {
 				fmt.Printf("File goroutine | File %s found!\n", file)
 				delete(files, file)
 
-				req := Message{"file", file}
+				req := Message{erisconfig.Name, "file", file}
 				sendInfo(req)
 			}
 		}

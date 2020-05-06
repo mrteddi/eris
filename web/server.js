@@ -82,7 +82,7 @@ app.post( `/api/createBox`, (req, res) => {
         }
     });
 
-    query = `http://10.0.0.206:5000/api/genDaemon?network=${req.body['network']}&ports=${req.body['ports']}&files=${filesJson}`;
+    query = `http://10.0.0.206:5000/api/genDaemon?name=${req.body['name']}&network=${req.body['network']}&ports=${req.body['ports']}&files=${filesJson}`;
     request.get( query );
 });
 
@@ -126,11 +126,28 @@ app.post('/api/receiveDaemon', (req, res ) => {
     console.log( req.body );
     console.log( req.body['Type'] );
 
-    res.send( "erisServer Okay" );
+    name = req.body['Name'];
+    type = req.body['Type'];
+    ans = req.body['Body'];
+
+    query = `select * from ${name}`
+
+    db.query( query, ( err, result ) => {
+        result = result[0];
+        for (let i = 0; i < result[`${type}Num`]; i++) {
+            if( result[`${type}${i}`] == ans ) {
+                query = `update ${name} set ${type}${i}Point = 1`
+                db.query( query, ( err, result ) => {
+                    res.send( `${type}${i}Point updated to 1` );
+                });
+            }
+        }
+    });
 });
 
 app.get( `/api/genDaemon`, ( req, res ) => {
 
+    name = req.query.name;
     network = req.query.network;
     ports = req.query.ports;
     fileString = "";
@@ -145,6 +162,9 @@ app.get( `/api/genDaemon`, ( req, res ) => {
 
     erisConfig = `
     package erisconfig
+
+    // Name configs
+    var Name string = "${name}"
 
     // Network interface configs
     var Network string = "${network}"
