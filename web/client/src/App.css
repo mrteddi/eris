@@ -4,11 +4,51 @@
 
 .machineCreation {
     display: block;
+    outline: none;
+    margin: 10px auto;
+    padding: 5px 10px;
+    border: none;
+    font-size: 20px;
+    color: white;
+    border-left: 3px solid green;
+    border-bottom: 3px solid #2a2a2a;
+    background-color: #1e1e1e;
+    transition: 0.3s ease-in-out;
+}
+
+.machineCreation:hover {
+    background-color: #2a2a2a;
+}
+
+.machineCreation:focus {
+    /* border: none;
+    border-bottom: 3px solid green; */
+    background-color: #2a2a2a;
+}
+
+.machineButton {
+    display: inline-block;
+    width: 50px;
+    margin: 10px 10px;
+    border: 2px solid green;
+}
+
+.machineInfo p {
+    margin: 0 0;
+    font-size: 14px;
+}
+
+.machineSubmit {
+    width: unset;
 }
 
 .mainBody {
     color: white;
 }
+
+/* .mainBody p {
+    font-size: 30px;
+} */
 
 .navbar-left {
     display: flex;
@@ -63,6 +103,68 @@
     font-size: 1.5em;
 }
 
-.App-intro {
-    font-size: large;
+.createButton {
+    margin: 20px 0;
+}
+
+.listButton {
+    border: none;
+    /* border: 3px solid green; */
+    border-left: 3px solid green;
+    background-color: #2a2a2a;
+    color: white;
+    padding: 10px 15px;
+    font-size: 20px;
+    transition: ease-in-out;
+    transition-duration: 0.3s;
+}
+
+.listButton:hover {
+    background-color: #1a1a1a;
+}
+
+.mainList {
+    padding-top: 20px;
+    width: 33%;
+    font-size: 20px;
+    color: white;
+    margin: auto auto;
+}
+
+.mainList p {
+    padding-bottom: 10px;
+    border-bottom: 3px solid green;
+}
+
+.creationBody {
+    margin: auto;
+    width: 50%;
+    font-size: 20px;
+}
+
+.machineRow {
+    /* border: 3px solid green; */
+}
+
+.machineCol {
+    padding: 10px 10px;
+    border-collapse: collapse;
+    border-left: 3px solid green;
+    border-right: 3px solid green;
+}
+
+tr:nth-child(odd) td { background: #1e1e1e; }
+
+.machineTable {
+    margin: auto;
+    border-collapse: collapse;
+    background-color: #2a2a2a;
+}
+
+.machineTitle {
+    font-size: 30px;
+}
+
+.downloadButton {
+    margin-top: 20px;
 }

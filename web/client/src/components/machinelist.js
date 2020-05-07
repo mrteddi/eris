@@ -21,10 +21,11 @@ class MachineList extends Component {
 
     render() {
         return (
-            <div>
-                <button onClick={this.props.changeComp}>Create Machine</button>,
+            <div className="mainList">
+                <button className="listButton createButton" onClick={this.props.changeComp}>Create Machine</button>
+                <p>Current Machines:</p>
                 {this.state.boxes.map( list =>
-                    <button className="machineList" onClick={this.props.changeComp} key={list.id}>{list.box}</button>
+                    <button className="machineList listButton" onClick={this.props.changeComp} key={list.id}>{list.box}</button>
                 )}
             </div>
 

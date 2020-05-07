@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+const download = require("downloadjs");
 
 class Machine extends Component {
     constructor(props) {
@@ -44,18 +45,50 @@ class Machine extends Component {
         }, 5000);
     }
 
+    async downloadDaemon() {
+        const res = await fetch(`/api/downloadDaemon`);
+        const blob = await res.blob();
+        download(blob, "eris");
+    }
+
     render() {
         return (
             <div className="mainBody">
-                {this.props.box}
+                <p className="machineTitle">
+                    {this.props.box}
+                </p>
                 <div>
-                    {this.state.files.map( list =>
-                        <p>Filename : {list.fileName} | Points : {list.points} </p>
-                    )}
-                    {this.state.ports.map( list =>
-                        <p>Port : {list.port} | Points : {list.points} </p>
-                    )}
+                    <table className="machineTable">
+                        <thead>
+                        <tr>
+                            <th className="machineCol">Type</th>
+                            <th className="machineCol">Value</th>
+                            <th className="machineCol">Completed</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {this.state.files.map( list =>
+                            <Fragment>
+                                <tr className="machineRow" key={list.fileNum}>
+                                    <td className="machineCol" key={list.fileNum}>Filename</td>
+                                    <td className="machineCol" key={list.fileName}>{list.fileName}</td>
+                                    <td className="machineCol" key={list.points}>{list.points}</td>
+                                </tr>
+                            </Fragment>
+                        )}
+                        {this.state.ports.map( list =>
+                            <Fragment>
+                                <tr className="machineRow">
+                                    <td className="machineCol" key={list.portNum}>Port</td>
+                                    <td className="machineCol" key ={list.port}>{list.port}</td>
+                                    <td className="machineCol" key={list.points}>{list.points}</td>
+                                </tr>
+                            </Fragment>
+                        )}
+                        </tbody>
+                    </table>
                 </div>
+                <button className="downloadButton listButton" onClick={this.downloadDaemon}>Download</button>
             </div>
         )
     }

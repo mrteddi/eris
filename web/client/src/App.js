@@ -32,7 +32,6 @@ class App extends Component {
                     </div>
                     <div className="navbar-right">
                         <ul className="navRightLinks">
-                            {/* <li className="navItem"><a href="/#">Login</a></li> */}
                             <li className="navItem"><a href="/">Home</a></li>
                         </ul>
                     </div>
@@ -46,7 +45,6 @@ class App extends Component {
                     :
                     <Machine box={this.state.clicked}/>
                 }
-                {/* <Create/> */}
             </div>
         );
     }

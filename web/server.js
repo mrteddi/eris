@@ -41,7 +41,7 @@ app.post( `/api/createBox`, (req, res) => {
     }
 
     for (let i = 0; i < req.body['files'].length; i++) {
-        query += `file${i} varchar(60), file${i}Point int, `;
+        query += `file${i} varchar(60), file${i}Point varchar(5), `;
         insertQuery += `file${i} = "${req.body['files'][i][0]}", `;
         let obj = {};
         obj['fileName'] = req.body['files'][i][0];
@@ -50,7 +50,7 @@ app.post( `/api/createBox`, (req, res) => {
     }
     filesJson = JSON.stringify(filesJson);
     for (let i = 0; i < req.body['ports'].length; i++) {
-        query += `port${i} varchar(60), port${i}Point int, `
+        query += `port${i} varchar(60), port${i}Point varchar(5), `
         insertQuery += `port${i} = "${req.body['ports'][i]}", `
     }
     query = query.slice(0, -2);
@@ -106,13 +106,13 @@ app.get(`/api/getInfo`, (req, res) => {
         for (let i = 0; i < result[0]['fileNum']; i++) {
             if( result[0][`file${i}Point`] === null ) {
                 result[0][`file${i}`] = "??";
-                result[0][`file${i}Point`] = "0";
+                result[0][`file${i}Point`] = "✗";
             }   
         }
         for (let i = 0; i < result[0]['portNum']; i++) {
             if( result[0][`port${i}Point`] === null ) {
                 result[0][`port${i}`] = "??";
-                result[0][`port${i}Point`] = "0";
+                result[0][`port${i}Point`] = "✗";
             }   
         }
 
@@ -136,7 +136,7 @@ app.post('/api/receiveDaemon', (req, res ) => {
         result = result[0];
         for (let i = 0; i < result[`${type}Num`]; i++) {
             if( result[`${type}${i}`] == ans ) {
-                query = `update ${name} set ${type}${i}Point = 1`
+                query = `update ${name} set ${type}${i}Point = '✓'`
                 db.query( query, ( err, result ) => {
                     res.send( `${type}${i}Point updated to 1` );
                 });

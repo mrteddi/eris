@@ -63,9 +63,12 @@ class Create extends Component {
         }
     }
 
-    updateFileCount = () => {
+    updateFileCount(sign) {
         let count = this.state.filecount;
-        count++;
+        count += ( 1 * sign )
+        if( count < 1 ) {
+            return;
+        }
         this.setState({
             filecount: count,
         });
@@ -80,18 +83,30 @@ class Create extends Component {
         }
 
         return (
-            <div className="mainBody">
-                Create a machine:
+            <div className="mainBody creationBody">
+                <p>Create a machine:</p>
                 <form onSubmit={ e => this.createBox(e)}>
-                    Name:
+                    <div className="machineInfo">
+                        Name:
+                    </div>
                     <input type='text' className="machineCreation" onChange={ e => this.changeHandler( e, 'name' )}/>
-                    Files: <button type="button" onClick={this.updateFileCount}>+</button>
+                    <div className="fileLine machineInfo">Files:
+                    <p>Full filepath, Epoch Timestamp</p>
+                    <button className="machineCreation machineButton" type="button" onClick={ e => this.updateFileCount(1)}>+</button>
+                    <button className="machineCreation machineButton" type="button" onClick={ e => this.updateFileCount(-1)}>-</button>
+                    </div>
                     {files}
-                    Ports:
+                    <div className="machineInfo">
+                        Ports:
+                        <p>Port, Port</p>
+                    </div>
                     <input type='text' className="machineCreation" onChange={ e => this.changeHandler( e, 'ports' )}/>
-                    Network Interface:
+                    <div className="machineInfo">
+                        Network Interface:
+                        <p>ifconfig to get interface</p>
+                    </div>
                     <input type='text' className="machineCreation" onChange={ e => this.changeHandler( e, 'network' )}/>
-                    <input type='submit'/>
+                    <input type='submit' className="machineCreation machineButton machineSubmit"/>
                 </form>
             </div>
         )
