@@ -88,7 +88,7 @@ class Machine extends Component {
                         </tbody>
                     </table>
                 </div>
-                <button className="downloadButton listButton" onClick={this.downloadDaemon}>Download</button>
+                {/* <button className="downloadButton listButton" onClick={this.downloadDaemon}>Download</button> */}
             </div>
         )
     }

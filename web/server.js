@@ -191,6 +191,13 @@ app.get( `/api/downloadDaemon`, ( req, res ) => {
     res.download( './eris' );
 })
 
+app.get( `/api/installer`, ( req, res ) => {
+    fs.readFile('./install.sh', 'utf8', function(err, data) {
+        if (err) throw err;
+        res.send( data );
+    });
+})
+
 const port = 5000;
 
 app.listen(port, () => `Server running on port ${port}`);

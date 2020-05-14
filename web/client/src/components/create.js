@@ -5,6 +5,7 @@ class Create extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            info: false,
             name: '',
             network: '',
             files: [],
@@ -31,6 +32,7 @@ class Create extends Component {
 
         fetch( `/api/createBox`, options )
             .then( res => console.log( res ) );
+
     }
 
     changeHandler(e, type, i) {
@@ -74,6 +76,13 @@ class Create extends Component {
         });
     }
 
+    revealInfo() {
+        let tmp = !this.state.info;
+        this.setState({
+            info: tmp,
+        })
+    }
+
     render() {
 
         const files = [];
@@ -85,27 +94,58 @@ class Create extends Component {
         return (
             <div className="mainBody creationBody">
                 <p>Create a machine:</p>
+                <button onClick={ e => this.revealInfo()} className="listButton createInfo">
+                    Input information
+                </button>
+                {this.state.info ?
+                    <div className="createExpand">
+                        <div>
+                            Files input must be in the form:
+                            <p>fullFilePath,EpochTimestamp</p>
+                            <p>Ex) /home/user/user.txt,1588896333</p>
+                            <p>Command:</p>
+                            <p className="createCommand">stat --format %X filename</p>
+                        </div>
+                        <div>
+                            Port input must be in the form:
+                            <p>port1,port2</p>
+                            <p>Ex) 21,22,23</p>
+                        </div>
+                        <div>
+                            Network interface can be found from
+                            <p>ifconfig, ip a, or iw</p>
+                            <p>Command:</p>
+                            <p className="createCommand">iw dev | awk '$1=="Interface"{'{'}print $2{'}'}'</p>
+                        </div>
+                    </div>
+                    :
+                    null
+                }
                 <form onSubmit={ e => this.createBox(e)}>
                     <div className="machineInfo">
                         Name:
                     </div>
                     <input type='text' className="machineCreation" onChange={ e => this.changeHandler( e, 'name' )}/>
                     <div className="fileLine machineInfo">Files:
-                    <p>Full filepath, Epoch Timestamp</p>
+                    {/* <p>Full filepath, Epoch Timestamp</p> */}
                     <button className="machineCreation machineButton" type="button" onClick={ e => this.updateFileCount(1)}>+</button>
                     <button className="machineCreation machineButton" type="button" onClick={ e => this.updateFileCount(-1)}>-</button>
                     </div>
                     {files}
                     <div className="machineInfo">
                         Ports:
-                        <p>Port, Port</p>
+                        {/* <p>Port, Port</p> */}
                     </div>
                     <input type='text' className="machineCreation" onChange={ e => this.changeHandler( e, 'ports' )}/>
                     <div className="machineInfo">
                         Network Interface:
-                        <p>ifconfig to get interface</p>
+                        {/* <p>ifconfig to get interface</p> */}
                     </div>
                     <input type='text' className="machineCreation" onChange={ e => this.changeHandler( e, 'network' )}/>
+                    <div className="createAfter">
+                        Copy this before submitting. Paste into vulnerable machine after submitting.
+                        <p>sudo sh -c "$(curl http://10.0.0.206:5000/api/installer)"</p>
+                    </div>
                     <input type='submit' className="machineCreation machineButton machineSubmit"/>
                 </form>
             </div>

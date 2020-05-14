@@ -168,3 +168,42 @@ tr:nth-child(odd) td { background: #1e1e1e; }
 .downloadButton {
     margin-top: 20px;
 }
+
+.createInfo {
+    outline: none;
+    margin-bottom: 5px;
+    font-size: 13px;
+    width: 50%;
+    border-left: none;
+    border-bottom: 3px solid green;
+}
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+.createExpand {
+    background-color: #2a2a2a;
+    font-size: 13px;
+    width: 50%;
+    margin: auto;
+    animation: fadeIn ease 0.8s;
+}
+
+.createExpand p {
+    margin: 2px 0;
+}
+
+.createCommand {
+    background-color: #1a1a1a;
+    /* width: 100px; */
+}
+
+.createExpand div {
+    margin-bottom: 10px;
+    border-bottom: 1px solid green;
+}
+
+.createAfter {
+    font-size: 14px;
+}
